@@ -7,6 +7,15 @@ import datetime
 # speech recognition library
 import speech_recognition as sr
 
+# wikipedia library
+import wikipedia as wiki
+
+# email library
+import smtplib
+
+# web browser library
+import webbrowser as wb
+
 # initializing the pyttsx3 
 engine = pyttsx3.init()
 
@@ -33,9 +42,9 @@ def date():
 
 def wishMe():
     """ wishMe function greet us everytime we start the application and say current date and time """
-    speak("Welcome Back Sir!")
-    time()
-    date()
+    speak("Welcome Back,")
+    # time()
+    # date()
 
     # adding more greeting statements to make it more pleasing and appealing
     hour = datetime.datetime.now().hour
@@ -73,4 +82,105 @@ def takeCommandFromUser():
     
     return query
 
-takeCommandFromUser()
+def sendEmail(to, content):
+    """ sendEmail function use to send email, It takes to argument `to = receiver's email` and `content = content of email` """
+
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    # ehlo function help us to identifying our self to esmt server
+    server.ehlo()
+    server.starttls()
+
+    # for jarvis being able to send email, we must enable low security setting in our gmail account
+    # update your email and password below
+    server.login('emailAddress@gmail.com', 'password@123')
+    server.sendmail('emailAddress@gmail.com', to, content)
+    server.close()
+
+if __name__ == "__main__":
+
+    wishMe()
+
+    while True:
+
+        # all the command will be stored in lower case in query
+        query  = takeCommandFromUser().lower()
+
+        # tell us time when asked
+        if 'time' in query:
+            time()
+        
+        # tell us time when asked
+        if 'date' in query:
+            date()
+        
+        elif 'wikipedia' in query:
+            speak('Searching....')
+
+            # replacing wikipedia
+            query = query.replace('wikipedia', '')
+            
+            # getting result of wikipedia search, return and speak first 3 line of search
+            result = wiki.summary(query, sentences = 3)
+            speak('According to Wikipedia')
+
+            # printing and speaking the result
+            print(result)
+            speak(result)
+        
+        elif 'send email' in query:
+            
+            try:
+
+                # storing each sentence of user in content
+                speak('sir, what do you want to say?')
+                content = takeCommandFromUser()
+
+                # provide reciever email address
+                speak("please provide me receiver's email adress")
+                receiver = input("Please, Enter the receiver's email address:")
+                to = receiver
+
+                # sending email
+                sendEmail(to, content)
+
+                # speaking what i have said to send in email, just for cross verification
+                speak(content)
+
+                speak("Email has been sent succesfully")
+            
+            except Exception as e:
+                print(e)
+                speak("Sorry, Unable to send Email.")
+
+        elif 'search in chrome' in query:
+
+            speak("Please say me what shoud I seach?")
+
+            # path of application install location
+            chromepath = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s'
+
+            # search string 
+            search = takeCommandFromUser().lower()
+            wb.get(chromepath).open_new_tab(search)
+        
+        elif 'search in youtube' in query:
+            
+            speak("Please say me what shoud I seach?")
+
+            # search string
+            searchTerm = takeCommandFromUser().lower()
+            speak("Here we go to YouTube!")
+
+            # searching on youtube
+            wb.open('https://www.youtube.com/results?search_query=' + searchTerm)
+
+        elif 'search in google' in query:
+            
+            speak("Please say me what shoud I seach?")
+
+            # search string
+            searchTerm = takeCommandFromUser().lower()
+            speak("Searching.....")
+
+            # searching on google
+            wb.open('https://www.google.com/search?q=' + searchTerm)
