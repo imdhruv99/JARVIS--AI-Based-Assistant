@@ -16,6 +16,15 @@ import smtplib
 # web browser library
 import webbrowser as wb
 
+# Laptop CPU and Battery Status
+import psutil
+
+# jokes library
+import pyjokes
+
+# operating system library
+import os
+
 # initializing the pyttsx3 
 engine = pyttsx3.init()
 
@@ -95,6 +104,37 @@ def sendEmail(to, content):
     server.login('emailAddress@gmail.com', 'password@123')
     server.sendmail('emailAddress@gmail.com', to, content)
     server.close()
+
+
+def cpu():
+    """ cpu function will give us infromation about cpu """
+
+    usage = str(psutil.cpu_percent())
+    speak('CPU is at' + usage)
+
+def battery():
+    """ Battery Function will give us information about battery """
+
+    battery = psutil.sensors_battery()
+    plugged = battery.power_plugged
+    percent = str(battery.percent)
+    if plugged:
+        speak("Battery is plugged in and battery percent is")
+        speak(percent)
+    else:
+        speak("Battery percent is")
+        speak(percent)
+
+def joke():
+    """ joke function will tell us jokes """
+
+    speak(pyjokes.get_joke())
+
+def offline():
+    """ Simple offline function """
+    quit()
+
+
 
 if __name__ == "__main__":
 
@@ -184,3 +224,22 @@ if __name__ == "__main__":
 
             # searching on google
             wb.open('https://www.google.com/search?q=' + searchTerm)
+        
+        elif 'cpu' in query:
+            cpu()
+        
+        elif 'battery' in query:
+            battery()
+
+        elif 'joke' in query:
+            joke()
+
+        elif 'go offline' in query:
+            speak('Going offline Sir!')
+            offline()
+
+        elif 'notepad' in query:
+            """ it is static as of now, i am searching for make it dynamic for each apps """
+            speak("Opening Notepad.....")
+            notepad = r'C:\Windows\System32\notepad.exe'
+            os.startfile(notepad)
