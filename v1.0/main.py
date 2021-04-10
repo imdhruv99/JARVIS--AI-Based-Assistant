@@ -25,6 +25,12 @@ import pyjokes
 # operating system library
 import os
 
+# gui library
+import pyautogui
+
+# random library
+import random
+
 # initializing the pyttsx3 
 engine = pyttsx3.init()
 
@@ -134,7 +140,9 @@ def offline():
     """ Simple offline function """
     quit()
 
-
+def screenShot():
+    img = pyautogui.screenshot()
+    img.save('E:/Photos and Videos/My Photos/screenshot.png')
 
 if __name__ == "__main__":
 
@@ -243,3 +251,68 @@ if __name__ == "__main__":
             speak("Opening Notepad.....")
             notepad = r'C:\Windows\System32\notepad.exe'
             os.startfile(notepad)
+        
+        # writing notes
+        elif 'write a note' in query:
+            speak('What should I write, Sir?')
+            # getting sentences from user
+            notes = takeCommandFromUser().lower()
+            file = open('note.txt', 'w')
+            # asking for Date and Time
+            speak("Sir, should I include Date and Time?")
+            ans = takeCommandFromUser().lower()
+            if 'yes' in ans or 'sure' in ans:
+                strTime = datetime.datetime.now().strftime("%H:%M:%S")
+                file.write(strTime)
+                file.write(':-')
+                file.write(notes)
+                speak("Done Taking Notes, Sir!")
+            else:
+                file.write(notes)
+        
+        # Speaking and reading Notes
+        elif 'show note' in query:
+            speak("Showing Notes")
+            file = open('notes.txt', 'r')
+            print(file.read())
+            speak(file.read())
+        
+        elif 'screenshot' in query:
+            speak("Taking Screenshot Sir!")
+            screenShot()
+            speak("Sir, Screenshot has been taken.")
+        
+        elif 'play music' in query:
+            songsDir = 'path to the location'
+            # listing all the song available in directory
+            music = os.listdir(songsDir)
+            speak('Which song song should I play?')
+            speak('select a number.....')
+            ans = takeCommandFromUser().lower()
+
+            while 'number' not in ans and ans != 'random' and ans!= 'you choose':
+                speak('I could not understand you, Please Try again.')
+                ans = takeCommandFromUser().lower()
+
+            if 'number' in ans:
+                # replacing integer value with number
+                no = int(ans.replace('number', ''))
+            
+            if 'random' or 'you choose' in ans:
+                no = random.randint(1, 100)
+            
+            # joining the songs directory with no of song
+            os.startfile(os.path.join(songsDir, music[no]))
+
+        # remeber that
+        elif 'remember that' in query:
+            speak("What should I remeber?")
+            memory = takeCommandFromUser()
+            speak("You asked me to remember that" + memory)
+            remember = open('memory.txt', 'w')
+            remember.write(memory)
+            remember.close()
+
+        elif 'do you remember anything' in query:
+            remember = open('memory.txt', 'r')
+            speak("You asked me to remember that" + remember.read())
