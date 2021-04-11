@@ -31,6 +31,15 @@ import pyautogui
 # random library
 import random
 
+# json library
+import json
+
+# http request library
+import requests
+
+# url library
+from urllib.request import urlopen
+
 # initializing the pyttsx3 
 engine = pyttsx3.init()
 
@@ -316,3 +325,31 @@ if __name__ == "__main__":
         elif 'do you remember anything' in query:
             remember = open('memory.txt', 'r')
             speak("You asked me to remember that" + remember.read())
+
+        # news 
+        elif 'news' in query:
+            try:
+            
+                # wallstreet news api
+                jsonObject = urlopen("https://newsapi.org/v2/everything?domains=wsj.com&apiKey=0cb8c1a6fc924e2e981077306a7336f3")
+                # loading json data
+                data = json.load(jsonObject)
+                i = 1
+                speak("Here are some top headlines from wall street news.....")
+                print('===========================TOP HEADLINES==========================='+'\n')
+                for item in data['articles']:
+                    print(str(i)+'. '+ item['title']+ '\n')
+                    print(item['description'] + '\n')
+                    speak(item['title'])
+                    i += 1
+            
+            except Exception as e:
+                print(str(e))
+        
+        elif 'where is' in query:
+            # replacing where is string, so code can understand the place or location name
+            query = query.replace("where is", "")
+            location = query
+            speak("User asked to locate" + location)
+            # open new tab from web browser library
+            wb.open_new_tab("https://www.google.com/maps/place/" + location)
