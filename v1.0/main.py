@@ -40,21 +40,29 @@ import requests
 # url library
 from urllib.request import urlopen
 
+# calculation library
+import wolframalpha as wfa
+
+# time library
+import time
+
 # initializing the pyttsx3 
 engine = pyttsx3.init()
+
+wfa_app_id = 'L87GUQ-RRUEE79WT5'
 
 def speak(audio):
     """ speak function take audio as string argument """
     engine.say(audio)
     engine.runAndWait()
 
-def time():
+def time_():
     """ time function says time in 12 hours format """
-    time = datetime.datetime.now().strftime("%I:%M:%S") # 12 hours time format
+    timeRes = datetime.datetime.now().strftime("%I:%M:%S") # 12 hours time format
     speak("The current time is")
-    speak(time)
+    speak(timeRes)
 
-def date():
+def date_():
     """ date funtion says date in date/month/year format """
     year = datetime.datetime.now().year
     month = datetime.datetime.now().month
@@ -155,6 +163,7 @@ def screenShot():
 
 if __name__ == "__main__":
 
+    # calling wish me function everytime jarvis wakes up
     wishMe()
 
     while True:
@@ -164,11 +173,11 @@ if __name__ == "__main__":
 
         # tell us time when asked
         if 'time' in query:
-            time()
+            time_()
         
         # tell us time when asked
         if 'date' in query:
-            date()
+            date_()
         
         elif 'wikipedia' in query:
             speak('Searching....')
@@ -353,3 +362,48 @@ if __name__ == "__main__":
             speak("User asked to locate" + location)
             # open new tab from web browser library
             wb.open_new_tab("https://www.google.com/maps/place/" + location)
+        
+        # calculate
+        elif 'calculate' in query:
+            client = wfa.Client(wfa_app_id)
+            # extracting index from query by splitting
+            index = query.lower().split().index('calculate')
+            query = query.split()[index + 1:]
+            result = client.query(''.join(query))
+            answer = next(result.results).text
+            print("The answer is:" + answer)
+            speak("The answer is" + answer)
+
+        # explaining words
+        elif 'what is' in query or 'who is' in query:
+            # using the same API
+            client = wfa.Client(wfa_app_id)
+            result = client.query(query)
+
+            try:
+                print(next(result.results).text)
+                speak(next(result.results).text)
+            except StopIteration:
+                print("No Results")
+        
+        # stop listening 
+        elif 'stop listening' in query:
+            speak('For how many second you want me to stop listening to your commands?')
+            ans = int(takeCommandFromUser())
+            time.sleep(ans)
+            print(ans)
+
+        # using below jarvis can control logout, restart and shutdown
+        elif 'log out' in query:
+            os.system("shutdown -l")
+        elif 'restart' in query:
+            os.system("shutdown /r /t 1")
+        elif 'shutdown' in query:
+            os.system("shutdown /s /t 1")
+
+#################################################
+#                                               #
+#  To make exe type below command in terminal   #
+#  pyinstaller --onefile  main.py               #
+#                                               #
+#################################################
